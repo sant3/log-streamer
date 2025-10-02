@@ -1,0 +1,86 @@
+# Dependencies
+frontend/node_modules/
+
+# Build outputs
+dist/
+backend/dist/
+frontend/dist/
+frontend/build/
+
+# Go binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+file-streamer
+file-streamer-*
+
+# Go test binary, built with `go test -c`
+*.test
+
+# Go coverage files
+*.out
+*.prof
+
+# Go vendor directory
+vendor/
+
+# Log files
+*.log
+backend/*.log
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+backend/.env*
+
+# SSL certificates and keys
+*.pem
+*.pem1
+*.key
+*.crt
+*.csr
+backend/*.pem*
+backend/*.key*
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+
+# Archives
+*.tar.gz
+*.zip
+*.rar
+
+# React specific
+frontend/.eslintcache
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+# Go module cache
+go.sum.backup
+
+# Test coverage
+coverage/
+*.cover
