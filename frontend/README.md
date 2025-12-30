@@ -1,16 +1,30 @@
+The frontend is a React application that provides a web interface for viewing log streams from the backend agent. It allows users to see a list of available log files and select one to view its content in real-time.
+
 ## Requisites
 
-Tested on **pnpm 10.24.0**
+- **Node.js**
+- **pnpm** (tested on v10.24.0)
 
-## How to run
+## How to run for development
 
-`rm -rf node_modules`
-`pnpm install`
-`pnpm run start` in dev mode on port 3000 *http://localhost:3000*
+1.  **Install dependencies:**
+    ```sh
+    # If you have not installed packages before
+    pnpm install
+    ```
+2.  **Start the development server:**
+    ```sh
+    # This runs the "start" script from package.json using react-scripts
+    pnpm run start
+    ```
+The application will be available in development mode at `http://localhost:3000`.
 
-## Build production
+## Build for production
 
+To create an optimized static build of the application, run:
 `pnpm run build`
+
+The output will be placed in the `build` directory, ready for deployment.
 
 ## TODO
 

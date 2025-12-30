@@ -1,15 +1,18 @@
+The backend is a lightweight Go application that serves log files from a specified directory over an HTTP/S WebSocket API. It is designed to be run as an agent on a server where log files are generated.
+
 ## Certificate
 
-`openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert-streamer.pem -days 9999
-`
+To run the server with HTTPS (enabled by default), you need a TLS certificate. You can generate a self-signed certificate and a decrypted private key using `make`:
 
-password cert: password
+```sh
+make generate-self-signed-cert
+```
 
-self signed: IT - Italy - Turin - MyCompany
+This command will create `cert-streamer.pem` and `decrypted_key.pem` in the `backend` directory.
 
-Go does not support encrypted private key for tls.
-To decrypt:
-openssl rsa -in key.pem -out decrypted_key.pem
+> **Note**: Go's native TLS support does not handle encrypted private keys. The command above generates a decrypted key for this reason. If you have an existing encrypted key, you can decrypt it using: `openssl rsa -in your_key.pem -out decrypted_key.pem`.
+
+The default password for the certificate is `password`, and the distinguished name is `/C=IT/ST=Italy/L=Turin/O=MyCompany/OU=MyDivision`.
 
 ---
 
@@ -19,7 +22,9 @@ openssl rsa -in key.pem -out decrypted_key.pem
 
 `go run . &`
 
-### Config
+---
+
+### Configurations
 
 Default port is 5005
 
@@ -67,12 +72,14 @@ Examples:
 
 ### API
 
-- /alive    -> return 200 OK
-- /stop     -> send sigterm kill to application
-- /restart  -> kill process e recreate child process
-- /stream-logs -> api that return stream of selected log file (file must be under `logsDir`)
-- /version -> return http code 200 and body version and buildDate program
-- /list-files -> return json with available .log file name 
+- `/alive` -> Returns `200 OK`.
+- `/version` -> Returns the version and build date of the application.
+- `/list-files` -> Returns a JSON array of available `.log` file names in the `logsDir`.
+- `/stream-logs` -> Establishes a WebSocket connection to stream the content of a selected log file.
+- `/stop` -> Sends a SIGTERM signal to gracefully shut down the application.
+- `/restart` -> Restarts the application by spawning a new child process.
+
+> **Note on `/stop` and `/restart`**: These endpoints provide a way to manage the agent's lifecycle via its API. While convenient for development, this is an unconventional pattern for production environments. It is generally recommended to manage the application process using a dedicated service manager like `systemd`, `supervisor`, or Docker.
 
 ### Logs
 

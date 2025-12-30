@@ -1,22 +1,41 @@
-## How to dist
+## Overview
 
-### Requirements BE(powershell or unix)
+**Log Streamer** is a web-based tool for streaming and viewing log files from a server in real-time. It consists of two main components:
 
-Suggest to install scoop on windows (https://scoop.sh/#/)
+- **A Go backend:** A lightweight agent that monitors log files in a specified directory and serves them over an HTTP/S WebSocket connection.
+- **A React frontend:** A user-friendly web interface that connects to the backend, lists available log files, and displays their content as a live stream.
 
-* make (scoop install main/make)
-* tar 
-* openssl (scoop install main/openssl) 
+For detailed information on each component, please refer to their respective READMEs:
 
-### Requirements FE(powershell or unix)
+- [Frontend README](./frontend/README.md)
+- [Backend README](./backend/README.md)
 
- * pnpm (tested on 10.24.0)
+## How to build for distribution
 
-`make dist-fe` create a **streamer.tar.gz** with client GUI under frontend/dist
+This project uses `make` to simplify the build and distribution process for both the frontend and backend components.
 
+### Requirements
 
-`make dist-be` create a multiple tar with binary agent under backed/dist based on OS and ARCH
+Before you begin, ensure you have the following tools installed:
 
+*   **For all platforms:**
+    *   `make`
+    *   `tar` (or a compatible version)
+    *   `openssl` (for certificate generation)
+*   **For the frontend:**
+    *   `pnpm` (tested on v10.24.0)
+*   **For the backend:**
+    *   Go (latest version recommended)
+
+### Distribution Commands
+
+-   `make dist-fe`: Builds the React frontend and packages it into a `streamer.tar.gz` archive located in `frontend/dist`.
+-   `make dist-be`: Builds the Go backend for Linux, macOS, and Windows (64-bit). The resulting archives (`.tar.gz` or `.zip`) will be placed in `backend/dist`.
+
+You can also build for a specific platform:
+-   `make dist-be-linux`
+-   `make dist-be-darwin`
+-   `make dist-be-windows`
 
 ### TODO
 * add BE for x32 ARCH
