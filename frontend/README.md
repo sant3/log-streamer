@@ -24,6 +24,33 @@ To connect to a backend agent running on `192.168.1.100:8080`, you would use the
 http://<your-frontend-address>/?host=192.168.1.100:8080
 ```
 
+## Managing the Server List
+
+For environments with multiple backend agents, you can enable a server selection panel.
+
+### Configuration
+
+The server list is managed by the `frontend/public/servers.json` file. You can edit this file to add, remove, or modify your servers. The file should contain a JSON array of objects, where each object has a `name` and a `url`:
+
+```json
+[
+  {
+    "name": "Localhost",
+    "url": "http://localhost:5005"
+  },
+  {
+    "name": "Production Server",
+    "url": "http://prod.server.example.com"
+  }
+]
+```
+
+### Behavior
+
+-   **Side Panel:** If the `servers.json` file contains **more than one server**, a collapsible side panel will appear on the left, allowing you to switch between them. If there is only one server (or the file is missing), the panel will not be displayed.
+-   **Default Server:** If the `host` query parameter is not present in the URL, the application will automatically use the **first server** from `servers.json` as the default connection.
+-   **Status Check:** The panel will periodically check the `/alive` endpoint of each server and display a green dot for online servers and a red dot for offline ones.
+
 ## How to run for development
 
 1.  **Install dependencies:**
