@@ -84,3 +84,7 @@ go.sum.backup
 # Test coverage
 coverage/
 *.cover
+
+# FE dep
+frontend/package-lock.json
+frontend/pnpm-lock.yaml
