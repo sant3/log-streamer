@@ -69,6 +69,13 @@ Examples:
 
 `STREAMER_PORT=5006 STREAMER_HTTPS_PORT=9443 STREAMER_ENABLE_HTTPS=false STREAMER_LOGS_DIR=/var/log go run .`
 
+## Testing
+
+The backend includes a suite of unit tests to verify the functionality of the API handlers. To run the tests, navigate to the `backend` directory and execute:
+
+```sh
+go test
+```
 
 ### API
 

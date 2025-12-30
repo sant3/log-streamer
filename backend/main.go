@@ -21,10 +21,10 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-// Version of the application
-const version = "0.0.1-SNAPSHOT"
-
-var buildDate string
+var (
+	version   = "0.0.1-SNAPSHOT"
+	buildDate string
+)
 
 // jwtSecret is initialized from flags/env in main
 var jwtSecret = []byte("qwertyuiopasdfghjklzxcvbnm123456")
@@ -35,10 +35,10 @@ var (
 	allowedOriginsCfg = []string{"http://localhost:3000", "https://anotherdomain.com", "http://localhost:1972"}
 )
 
-// streamLogs streams the content of a selected .log file using Server-Sent Events.
+// streamLogsHandler streams the content of a selected .log file using Server-Sent Events.
 // It enforces that the file resides inside the configured logs directory and
 // terminates when the client disconnects.
-func streamLogs(w http.ResponseWriter, r *http.Request) {
+func streamLogsHandler(w http.ResponseWriter, r *http.Request) {
 	// set CORS header
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Content-Type", "text/event-stream")
@@ -47,7 +47,8 @@ func streamLogs(w http.ResponseWriter, r *http.Request) {
 
 	fileName := r.URL.Query().Get("file")
 	if fileName == "" {
-		fileName = "mylog.log"
+		http.Error(w, "Error: 'file' query parameter is required", http.StatusBadRequest)
+		return
 	}
 
 	// Prevent directory traversal: only allow base file names within logsDir
@@ -61,6 +62,13 @@ func streamLogs(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fullPath := filepath.Join(logsDir, fileName)
+
+	fileInfo, err := os.Stat(fullPath)
+	if err != nil || fileInfo.IsDir() {
+		log.Printf("Log file not found or is a directory: %s", fullPath)
+		http.Error(w, "Error: log file not found or is not a regular file", http.StatusInternalServerError)
+		return
+	}
 
 	file, err := os.Open(fullPath)
 	if err != nil {
@@ -105,17 +113,11 @@ func streamLogs(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// isAlive is a basic liveness probe that returns HTTP 200 when the process is healthy.
-func isAlive(w http.ResponseWriter, r *http.Request) {
-	// set CORS header
-	// w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, Authorization,X-CSRF-Token")
-	// w.Header().Set("Access-Control-Allow-Origin", "*")
-	// w.Header().Set("Content-Type", "text/event-stream")
+// aliveHandler is a basic liveness probe that returns HTTP 200 when the process is healthy.
+func aliveHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", "no-cache")
-	// w.Header().Set("Connection", "keep-alive")
-
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "OK\n")
+	fmt.Fprintf(w, "OK")
 }
 
 // gracefulShutdown installs the platform-specific signal handler and exits cleanly on interrupt.
@@ -165,16 +167,16 @@ func stopHandler(w http.ResponseWriter, r *http.Request) {
 // Note: behavior can vary across platforms; confirm support on Windows.
 func restartHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf(".....RESTART INVOKED.....")
-	// Crea un nuovo processo figlio
+	// Create new child process
 	cmd := exec.Command(os.Args[0], os.Args[1:]...)
 	cmd.Start()
 
-	// Termina il processo corrente in modo compatibile con il sistema operativo
+	// Shutdown current process, by OS
 	terminateSelf()
 }
 
-// listLogFiles returns the list of available .log files under the configured logs directory.
-func listLogFiles(w http.ResponseWriter, r *http.Request) {
+// listFilesHandler returns the list of available .log files under the configured logs directory.
+func listFilesHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Content-Type", "application/json")
 
@@ -202,18 +204,21 @@ func listLogFiles(w http.ResponseWriter, r *http.Request) {
 	w.Write(jsonResponse)
 }
 
-// startServer starts an HTTP or HTTPS server on the given port with the provided mux.
-// For TLS, provide non-empty certPath and keyPath.
-func startServer(port int, useTLS bool, certPath string, keyPath string) {
-	mux := http.NewServeMux() // Create a new ServeMux for each server
-	mux.HandleFunc("/stream-logs", streamLogs)
-	// mux.HandleFunc("/alive", corsMiddleware(authenticateJWT(isAlive)))
-	mux.HandleFunc("/alive", corsMiddleware(isAlive))
+func setupRouter() *http.ServeMux {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/stream-logs", corsMiddleware(streamLogsHandler))
+	// mux.HandleFunc("/alive", corsMiddleware(authenticateJWT(aliveHandler)))
+	mux.HandleFunc("/alive", corsMiddleware(aliveHandler))
 	mux.HandleFunc("/restart", restartHandler)
 	mux.HandleFunc("/stop", stopHandler)
-	mux.HandleFunc("/version", getVersion)
-	mux.HandleFunc("/list-files", listLogFiles)
+	mux.HandleFunc("/version", corsMiddleware(versionHandler))
+	mux.HandleFunc("/list-files", corsMiddleware(listFilesHandler))
+	return mux
+}
 
+// startServer starts an HTTP or HTTPS server on the given port with the provided mux.
+// For TLS, provide non-empty certPath and keyPath.
+func startServer(port int, useTLS bool, certPath string, keyPath string, mux http.Handler) {
 	addr := fmt.Sprintf(":%d", port)
 	if useTLS {
 		log.Printf("HTTPS server started on port: %d", port)
@@ -224,10 +229,15 @@ func startServer(port int, useTLS bool, certPath string, keyPath string) {
 	}
 }
 
-// getVersion returns the application version and build date.
-func getVersion(w http.ResponseWriter, r *http.Request) {
+// versionHandler returns the application version and build date as JSON.
+func versionHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "Version: %s \nBuild date: %s", version, buildDate)
+	response := map[string]string{
+		"version":   version,
+		"buildDate": buildDate,
+	}
+	json.NewEncoder(w).Encode(response)
 }
 
 var allowedIPs = map[string]bool{
@@ -440,11 +450,15 @@ func main() {
 		jwtSecret = []byte(*jwtSecretPtr)
 	}
 
-	go startServer(port, false, "", "") // Start HTTP server
+	// Setup router
+	router := setupRouter()
+
+	// Start servers
+	go startServer(port, false, "", "", router) // Start HTTP server
 	if useHTTPS {
-		startServer(httpsPort, true, certPath, keyPath) // Start HTTPS server
+		startServer(httpsPort, true, certPath, keyPath, router) // Start HTTPS server
 	} else {
+		// Block forever if only HTTP is running
 		select {}
 	}
-
 }
