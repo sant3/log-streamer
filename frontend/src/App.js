@@ -48,7 +48,13 @@ function App() {
   useEffect(() => {
     fetch('/servers.json')
       .then(response => response.json())
-      .then(data => setServers(data))
+      .then(data => {
+        setServers(data);
+        // If host is not set by query param, default to the first server in the list
+        if (!getQueryParam('host') && data.length > 0) {
+          setActiveHost(data[0].url);
+        }
+      })
       .catch(err => console.error("Failed to load servers.json:", err));
   }, []);
 
@@ -196,28 +202,32 @@ function App() {
   }, [logs, autoScroll]);
 
   return (
-    <div className={`app-wrapper ${isPanelOpen ? 'panel-open' : ''}`}>
-      <div className="side-panel">
-        <h3>Servers</h3>
-        <ul className="server-list">
-          {servers.map(server => (
-            <li 
-              key={server.name} 
-              onClick={() => handleServerSelect(server.url)}
-              className={activeHost === server.url ? 'active' : ''}
-            >
-              <span className={`status-dot ${serverStatuses[server.name] || 'offline'}`}></span>
-              {server.name}
-            </li>
-          ))}
-        </ul>
-      </div>
+    <div className={`app-wrapper ${isPanelOpen && servers.length > 1 ? 'panel-open' : ''}`}>
+      {servers.length > 1 && (
+        <>
+          <div className="side-panel">
+            <h3>Servers</h3>
+            <ul className="server-list">
+              {servers.map(server => (
+                <li
+                  key={server.name}
+                  onClick={() => handleServerSelect(server.url)}
+                  className={activeHost === server.url ? 'active' : ''}
+                >
+                  <span className={`status-dot ${serverStatuses[server.name] || 'offline'}`}></span>
+                  {server.name}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <button onClick={() => setIsPanelOpen(!isPanelOpen)} className="panel-toggle">
+            {isPanelOpen ? '<' : '>'}
+          </button>
+        </>
+      )}
 
       <div className="main-content">
         <div className="container">
-        <button onClick={() => setIsPanelOpen(!isPanelOpen)} className="panel-toggle">
-          {isPanelOpen ? '<' : '>'}
-        </button>
           <div className="header">
             <img src={process.env.PUBLIC_URL + '/main_logo.svg'} alt="Log Streamer Logo" className="main-logo" />
             <div className="controls">
