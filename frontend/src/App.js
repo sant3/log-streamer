@@ -187,46 +187,46 @@ function App() {
   return (
     <div className="container">
       <div className="header">
-
-        <input
-          type="text"
-          value={logFile}
-          onChange={(e) => setLogFile(e.target.value)}
-          placeholder="Enter log file name or select from combo"
-          list="log-files" // Associate list file name to input
-        />
-        
-       
-
-        <datalist id="log-files">
-          {availableLogFiles && availableLogFiles.length > 0 ? (
-            availableLogFiles.map((file, index) => (
-              <option key={index} value={file}>
-                {file}
-              </option>
-            ))
-          ) : (
-            <option disabled>No files available</option>
-          )}
-        </datalist>
-
-
-        <button onClick={handleStart}>Start</button>
-        <button onClick={handleStop}>Stop</button>
-        <button onClick={handleClear}>Clear</button>
-        <button onClick={increaseFontSize}>+ Font Size</button>
-        <button onClick={decreaseFontSize}>- Font Size</button>
-        <button onClick={toggleLineNumbers}>
-          {showLineNumbers ? 'Hide Line Numbers' : 'Show Line Numbers'}
-        </button>
-        <label>
+        <img src={process.env.PUBLIC_URL + '/main_logo.svg'} alt="Log Streamer Logo" className="main-logo" />
+        <div className="controls">
           <input
-            type="checkbox"
-            checked={autoScroll}
-            onChange={() => setAutoScroll(!autoScroll)}
+            type="text"
+            value={logFile}
+            onChange={(e) => setLogFile(e.target.value)}
+            placeholder="Enter log file name or select from combo"
+            list="log-files" // Associate list file name to input
           />
-          Auto-Scroll
-        </label>
+          <datalist id="log-files">
+            {availableLogFiles && availableLogFiles.length > 0 ? (
+              availableLogFiles.map((file, index) => (
+                <option key={index} value={file}>
+                  {file}
+                </option>
+              ))
+            ) : (
+              <option disabled>No files available</option>
+            )}
+          </datalist>
+          
+          <div className="button-group">
+            <button onClick={handleStart}>Start</button>
+            <button onClick={handleStop}>Stop</button>
+            <button onClick={handleClear}>Clear</button>
+            <button onClick={increaseFontSize}>+ Font Size</button>
+            <button onClick={decreaseFontSize}>- Font Size</button>
+            <button onClick={toggleLineNumbers}>
+              {showLineNumbers ? 'Hide Line Numbers' : 'Show Line Numbers'}
+            </button>
+            <label>
+              <input
+                type="checkbox"
+                checked={autoScroll}
+                onChange={() => setAutoScroll(!autoScroll)}
+              />
+              Auto-Scroll
+            </label>
+          </div>
+        </div>
       </div>
       <div className="log-container" ref={logContainerRef} style={{ fontSize: `${fontSize}px` }} data-testid="log-container">
         {error && <p className="error-message">{error}</p>}
