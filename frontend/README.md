@@ -7,6 +7,23 @@ The frontend is a React application that provides a web interface for viewing lo
 - **Node.js**
 - **pnpm** (tested on v10.24.0)
 
+## Configuring the Backend Host
+
+The frontend needs to know the address of the backend agent to connect to. This can be configured at runtime:
+
+-   **By default**, the application will try to connect to `http://localhost:5005`.
+-   **To override the default**, you can specify a different address using the `host` query parameter in the URL.
+
+The application ensures the URL has a valid schema (e.g., `http://`).
+
+**Example:**
+
+To connect to a backend agent running on `192.168.1.100:8080`, you would use the following URL:
+
+```
+http://<your-frontend-address>/?host=192.168.1.100:8080
+```
+
 ## How to run for development
 
 1.  **Install dependencies:**
