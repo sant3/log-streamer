@@ -201,7 +201,9 @@ function App() {
         <datalist id="log-files">
           {availableLogFiles && availableLogFiles.length > 0 ? (
             availableLogFiles.map((file, index) => (
-              <option key={index} value={file} />
+              <option key={index} value={file}>
+                {file}
+              </option>
             ))
           ) : (
             <option disabled>No files available</option>
@@ -226,7 +228,7 @@ function App() {
           Auto-Scroll
         </label>
       </div>
-      <div className="log-container" ref={logContainerRef} style={{ fontSize: `${fontSize}px` }}>
+      <div className="log-container" ref={logContainerRef} style={{ fontSize: `${fontSize}px` }} data-testid="log-container">
         {error && <p className="error-message">{error}</p>}
         {logs.map((log, index) => (
           <div key={index} className="log-message">

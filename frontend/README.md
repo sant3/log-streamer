@@ -41,9 +41,20 @@ The application will be available in development mode at `http://localhost:3000`
 ## Build for production
 
 To create an optimized static build of the application, run:
-`pnpm run build`
-
+```sh
+pnpm run build
+```
 The output will be placed in the `build` directory, ready for deployment.
+
+
+## Testing
+This project uses Jest and React Testing Library for unit tests. To run the tests, use the following command:
+
+```sh
+pnpm test
+```
+
+This will launch the test runner in interactive watch mode.
 
 ## TODO
 
