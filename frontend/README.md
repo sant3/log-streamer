@@ -1,5 +1,7 @@
 The frontend is a React application that provides a web interface for viewing log streams from the backend agent. It allows users to see a list of available log files and select one to view its content in real-time.
 
+![alt text](../img/preview.png)
+
 ## Requisites
 
 - **Node.js**
