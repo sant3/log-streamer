@@ -91,4 +91,3 @@ This will launch the test runner in interactive watch mode.
 * complete support for jwt token
 * add config for protocol (https|http)
 * add config for auth mode (none|basic|jwt)
-* add support for dark/light theme
