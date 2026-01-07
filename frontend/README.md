@@ -26,14 +26,17 @@ http://<your-frontend-address>/?host=192.168.1.100:8080
 
 ## Managing the Server List
 
-For environments with multiple backend agents, you can enable a server selection panel.
+For environments with multiple backend agents, you can enable a server selection panel. This feature allows you to switch between different backend instances directly from the UI.
 
 ### Configuration
 
-The server list is managed by the `frontend/public/servers.json` file. You can edit this file to add, remove, or modify your servers. The file should contain a JSON array of objects, where each object has a `name` and a `url`:
+The server list is managed by the `frontend/public/servers.js` file. This file is not bundled with the application, which means you can edit it after the production build without needing to recompile.
 
-```json
-[
+To configure your servers, edit `servers.js` to define a global `window.APP_SERVERS` variable. This variable should be an array of objects, where each object has a `name` and a `url`:
+
+```javascript
+// public/servers.js
+window.APP_SERVERS = [
   {
     "name": "Localhost",
     "url": "http://localhost:5005"
@@ -42,13 +45,15 @@ The server list is managed by the `frontend/public/servers.json` file. You can e
     "name": "Production Server",
     "url": "http://prod.server.example.com"
   }
-]
+];
 ```
+
+This method works for pages served over `http://` and for local `index.html` files opened via `file:///`.
 
 ### Behavior
 
--   **Side Panel:** If the `servers.json` file contains **more than one server**, a collapsible side panel will appear on the left, allowing you to switch between them. If there is only one server (or the file is missing), the panel will not be displayed.
--   **Default Server:** If the `host` query parameter is not present in the URL, the application will automatically use the **first server** from `servers.json` as the default connection.
+-   **Side Panel:** If the `servers.js` file defines **more than one server**, a collapsible side panel will appear on the left, allowing you to switch between them. If there is only one server (or the file is missing/empty), the panel will not be displayed.
+-   **Default Server:** If the `host` query parameter is not present in the URL, the application will automatically use the **first server** from the `window.APP_SERVERS` list as the default connection.
 -   **Status Check:** The panel will periodically check the `/alive` endpoint of each server and display a green dot for online servers and a red dot for offline ones.
 
 ## How to run for development

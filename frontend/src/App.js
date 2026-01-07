@@ -24,6 +24,8 @@ const getFileNameQueryParam = () => {
   }
 }
 
+const POLLING_ALIVE_MS = 10000;
+
 function App() {
   const [theme, setTheme] = useState('dark'); // Initialize theme state to 'dark'
   const [logs, setLogs] = useState([]);
@@ -43,28 +45,29 @@ function App() {
   const [serverStatuses, setServerStatuses] = useState({});
   
   // Use a more descriptive name for the currently selected host
-  const [activeHost, setActiveHost] = useState(() => ensureUrlSchema(getQueryParam('host') || 'http://localhost:5005'));
+  const [activeHost, setActiveHost] = useState('');
 
   const queryFileName = getQueryParam('file');
+
+  // Load servers from global variable
+  useEffect(() => {
+    const serversData = window.APP_SERVERS || [];
+    setServers(serversData);
+
+    const hostParam = getQueryParam('host');
+    if (hostParam) {
+      setActiveHost(ensureUrlSchema(hostParam));
+    } else if (serversData.length > 0) {
+      setActiveHost(serversData[0].url);
+    } else {
+      setActiveHost('http://localhost:5005');
+    }
+  }, []);
 
   // Function to toggle theme
   const toggleTheme = () => {
     setTheme((prevTheme) => (prevTheme === 'dark' ? 'light' : 'dark'));
   };
-
-  // Fetch the list of servers from the public JSON file
-  useEffect(() => {
-    fetch('/servers.json')
-      .then(response => response.json())
-      .then(data => {
-        setServers(data);
-        // If host is not set by query param, default to the first server in the list
-        if (!getQueryParam('host') && data.length > 0) {
-          setActiveHost(data[0].url);
-        }
-      })
-      .catch(err => console.error("Failed to load servers.json:", err));
-  }, []);
 
   // Function to check the status of all servers
   const updateServerStatuses = useCallback(async () => {
@@ -73,7 +76,7 @@ function App() {
     const statuses = {};
     for (const server of servers) {
       try {
-        const response = await fetch(`${server.url}/alive`, { signal: AbortSignal.timeout(5000) });
+        const response = await fetch(`${server.url}/alive`, { signal: AbortSignal.timeout(POLLING_ALIVE_MS) });
         statuses[server.name] = response.ok ? 'online' : 'offline';
       } catch (error) {
         statuses[server.name] = 'offline';
