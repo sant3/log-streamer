@@ -86,10 +86,7 @@ This will launch the test runner in interactive watch mode.
 ## TODO
 
 * config to enable/disable autocomplete
-* add config for list server
-  * add right panel to show server list 
 * clean up code
-* add some tests
 * add support for basic auth
 * complete support for jwt token
 * add config for protocol (https|http)

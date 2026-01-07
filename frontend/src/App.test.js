@@ -1,8 +1,8 @@
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import App from './App';
 
 // Mock the global fetch function
-global.fetch = jest.fn();
+globalThis.fetch = jest.fn();
 
 // Mock for EventSource
 class MockEventSource {
@@ -13,7 +13,7 @@ class MockEventSource {
   }
   close() {}
 }
-global.EventSource = MockEventSource;
+globalThis.EventSource = MockEventSource;
 
 
 describe('App component', () => {
@@ -25,6 +25,15 @@ describe('App component', () => {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve(['system.log', 'application.log']),
+        });
+      }
+      if (url.endsWith('/servers.json')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve([
+            { name: "Test Server 1", url: "http://test1.local" },
+            { name: "Test Server 2", url: "http://test2.local" },
+          ]),
         });
       }
       return Promise.resolve({ ok: true }); // Default success for other calls like /alive
@@ -45,7 +54,6 @@ describe('App component', () => {
       render(<App />);
     });
     
-    // Instead of findByRole, let's use findByText which is more flexible for datalist options.
     // It will wait for the text to appear in the DOM.
     expect(await screen.findByText('system.log')).toBeInTheDocument();
     expect(await screen.findByText('application.log')).toBeInTheDocument();
