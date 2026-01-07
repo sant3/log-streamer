@@ -1,12 +1,12 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import './App.css';
 import ThemeSwitcher from './components/ThemeSwitcher'; // Import the ThemeSwitcher component
+import Loader from './components/Loader'; // Import the Loader component
 
 const getQueryParam = (param) => {
   const queryParams = new URLSearchParams(window.location.search);
   return queryParams.get(param);
 };
-
 const ensureUrlSchema = (url) => {
   if (!url) return '';
   if (!/^https?:\/\//i.test(url)) {
@@ -35,6 +35,7 @@ function App() {
   const logContainerRef = useRef(null);
   const [autoScroll, setAutoScroll] = useState(true);
   const [availableLogFiles, setAvailableLogFiles] = useState([]);
+  const [isLoadingServers, setIsLoadingServers] = useState(false); // New state for loader
 
   // New state for side panel and servers
   const [isPanelOpen, setIsPanelOpen] = useState(true);
@@ -91,6 +92,7 @@ function App() {
 
   const loadLogFiles = useCallback(async () => {
     if (!activeHost) return;
+    setIsLoadingServers(true); // Start loading
     try {
       const response = await fetch(`${activeHost}/list-files`);
       if (response.ok) {
@@ -103,6 +105,8 @@ function App() {
     } catch (error) {
       setAvailableLogFiles([]);
       setError('Error fetching log files.');
+    } finally {
+      setIsLoadingServers(false); // End loading
     }
   }, [activeHost]);
 
@@ -179,6 +183,7 @@ function App() {
     setActiveHost(serverUrl);
     // Clear logs and file selection when changing servers
     handleClear();
+    // loadLogFiles will be triggered by activeHost change in useEffect
   };
 
   const handleStop = () => {
@@ -214,6 +219,7 @@ function App() {
 
   return (
     <div className={`app-wrapper ${isPanelOpen && servers.length > 1 ? 'panel-open' : ''} ${theme}`}>
+      {isLoadingServers && <Loader />}
       {servers.length > 1 && (
         <>
           <div className="side-panel">
