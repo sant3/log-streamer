@@ -49,11 +49,16 @@ function App() {
 
   const queryFileName = getQueryParam('file');
 
+    // Autocomplete state
+  const [suggestions, setSuggestions] = useState([]);
+  const [isInputFocused, setIsInputFocused] = useState(false);
+  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
+  const suggestionsListRef = useRef(null);
+
   // Load servers from global variable
   useEffect(() => {
     const serversData = window.APP_SERVERS || [];
     setServers(serversData);
-
     const hostParam = getQueryParam('host');
     if (hostParam) {
       setActiveHost(ensureUrlSchema(hostParam));
@@ -64,10 +69,68 @@ function App() {
     }
   }, []);
 
+  // Effect to update suggestions when dependencies change
+  useEffect(() => {
+    if (isInputFocused) {
+      const filtered = availableLogFiles.filter(file =>
+        file.toLowerCase().includes(logFile.toLowerCase())
+      );
+      setSuggestions(filtered);
+    } else {
+      setSuggestions([]);
+    }
+  }, [isInputFocused, logFile, availableLogFiles]);
+
+
   // Function to toggle theme
   const toggleTheme = () => {
     setTheme((prevTheme) => (prevTheme === 'dark' ? 'light' : 'dark'));
   };
+
+  const handleLogFileChange = (e) => {
+    setLogFile(e.target.value);
+    setActiveSuggestionIndex(-1); // Reset active suggestion on text change
+  };
+
+  const handleSuggestionClick = (suggestion) => {
+    setLogFile(suggestion);
+    setIsInputFocused(false);
+    setActiveSuggestionIndex(-1);
+  };
+
+  const handleKeyDown = (e) => {
+    if (suggestions.length === 0) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActiveSuggestionIndex(prevIndex =>
+        prevIndex < suggestions.length - 1 ? prevIndex + 1 : 0
+      );
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActiveSuggestionIndex(prevIndex =>
+        prevIndex > 0 ? prevIndex - 1 : suggestions.length - 1
+      );
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (activeSuggestionIndex !== -1) {
+        handleSuggestionClick(suggestions[activeSuggestionIndex]);
+      }
+    } else if (e.key === 'Escape') {
+      setIsInputFocused(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeSuggestionIndex !== -1 && suggestionsListRef.current) {
+      const activeItem = suggestionsListRef.current.children[activeSuggestionIndex];
+      if (activeItem) {
+        activeItem.scrollIntoView({
+          block: 'nearest',
+        });
+      }
+    }
+  }, [activeSuggestionIndex]);
 
   // Function to check the status of all servers
   const updateServerStatuses = useCallback(async () => {
@@ -200,6 +263,8 @@ function App() {
     setError('');
     handleStop();
     setLogFile('');
+    setSuggestions([]);
+    setActiveSuggestionIndex(-1);
   };
 
   const increaseFontSize = () => {
@@ -253,22 +318,31 @@ function App() {
               <img src={process.env.PUBLIC_URL + '/main_logo.svg'} alt="Log Streamer Logo" className="main-logo" />
             </div>
             <div className="controls">
-              <input
-                type="text"
-                value={logFile}
-                onChange={(e) => setLogFile(e.target.value)}
-                placeholder="Enter log file name or select from combo"
-                list="log-files"
-              />
-              <datalist id="log-files">
-                {availableLogFiles && availableLogFiles.length > 0 ? (
-                  availableLogFiles.map((file, index) => (
-                    <option key={index} value={file}>{file}</option>
-                  ))
-                ) : (
-                  <option disabled>No files available</option>
+              <div className="autocomplete-wrapper">
+                <input
+                  type="text"
+                  value={logFile}
+                  onChange={handleLogFileChange}
+                  onFocus={() => setIsInputFocused(true)}
+                  onBlur={() => setTimeout(() => setIsInputFocused(false), 200)} // Delay to allow click
+                  onKeyDown={handleKeyDown}
+                  placeholder="Enter log file name"
+                  autoComplete="off"
+                />
+                {isInputFocused && suggestions.length > 0 && (
+                  <ul className="suggestions-list" ref={suggestionsListRef}>
+                    {suggestions.map((file, index) => (
+                      <li
+                        key={index}
+                        className={index === activeSuggestionIndex ? 'active' : ''}
+                        onMouseDown={() => handleSuggestionClick(file)}
+                      >
+                        {file}
+                      </li>
+                    ))}
+                  </ul>
                 )}
-              </datalist>
+              </div>
               
               <div className="button-group">
                 <button onClick={handleStart}>Start</button>
