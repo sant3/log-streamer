@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import './App.css';
+import ThemeSwitcher from './components/ThemeSwitcher'; // Import the ThemeSwitcher component
 
 const getQueryParam = (param) => {
   const queryParams = new URLSearchParams(window.location.search);
@@ -24,6 +25,7 @@ const getFileNameQueryParam = () => {
 }
 
 function App() {
+  const [theme, setTheme] = useState('dark'); // Initialize theme state to 'dark'
   const [logs, setLogs] = useState([]);
   const [logFile, setLogFile] = useState('');
   const [error, setError] = useState('');
@@ -43,6 +45,11 @@ function App() {
   const [activeHost, setActiveHost] = useState(() => ensureUrlSchema(getQueryParam('host') || 'http://localhost:5005'));
 
   const queryFileName = getQueryParam('file');
+
+  // Function to toggle theme
+  const toggleTheme = () => {
+    setTheme((prevTheme) => (prevTheme === 'dark' ? 'light' : 'dark'));
+  };
 
   // Fetch the list of servers from the public JSON file
   useEffect(() => {
@@ -187,9 +194,13 @@ function App() {
     setLogFile('');
   };
 
-  const increaseFontSize = () => setFontSize(fontSize + 2);
+  const increaseFontSize = () => {
+    if (fontSize < 20)
+      setFontSize(fontSize + 2);
+  }
   const decreaseFontSize = () => {
-    if (fontSize > 10) setFontSize(fontSize - 2);
+    if (fontSize > 10) 
+      setFontSize(fontSize - 2);
   };
   const toggleLineNumbers = () => setShowLineNumbers(!showLineNumbers);
 
@@ -202,7 +213,7 @@ function App() {
   }, [logs, autoScroll]);
 
   return (
-    <div className={`app-wrapper ${isPanelOpen && servers.length > 1 ? 'panel-open' : ''}`}>
+    <div className={`app-wrapper ${isPanelOpen && servers.length > 1 ? 'panel-open' : ''} ${theme}`}>
       {servers.length > 1 && (
         <>
           <div className="side-panel">
@@ -229,7 +240,9 @@ function App() {
       <div className="main-content">
         <div className="container">
           <div className="header">
-            <img src={process.env.PUBLIC_URL + '/main_logo.svg'} alt="Log Streamer Logo" className="main-logo" />
+            <div style={{display: 'flex', alignItems: 'center'}}>
+              <img src={process.env.PUBLIC_URL + '/main_logo.svg'} alt="Log Streamer Logo" className="main-logo" />
+            </div>
             <div className="controls">
               <input
                 type="text"
@@ -265,6 +278,7 @@ function App() {
                   />
                   Auto-Scroll
                 </label>
+                <ThemeSwitcher theme={theme} toggleTheme={toggleTheme} /> {/* Moved ThemeSwitcher here */}
               </div>
             </div>
           </div>
