@@ -38,6 +38,7 @@ function App() {
   const [autoScroll, setAutoScroll] = useState(true);
   const [availableLogFiles, setAvailableLogFiles] = useState([]);
   const [isLoadingServers, setIsLoadingServers] = useState(false); // New state for loader
+  const [isStreaming, setIsStreaming] = useState(false); // New state for streaming status
 
   // New state for side panel and servers
   const [isPanelOpen, setIsPanelOpen] = useState(true);
@@ -218,10 +219,12 @@ function App() {
       }
       setError('');
       setLogs((prevLogs) => [...prevLogs, event.data]);
+      setIsStreaming(true);
     };
     newEventSource.onerror = () => {
       console.error('EventSource failed.');
       setError('EventSource failed.');
+      setIsStreaming(false);
       newEventSource.close();
     };
     eventSourceRef.current = newEventSource;
@@ -254,6 +257,7 @@ function App() {
   const handleStop = () => {
     if (eventSourceRef.current) {
       eventSourceRef.current.close();
+      setIsStreaming(false);
     }
   };
 
@@ -360,6 +364,7 @@ function App() {
                   />
                   Auto-Scroll
                 </label>
+                <div className={`streaming-indicator ${isStreaming ? 'active' : 'inactive'}`} title={isStreaming ? 'Streaming Active' : 'Streaming Inactive'}></div>
                 <ThemeSwitcher theme={theme} toggleTheme={toggleTheme} /> {/* Moved ThemeSwitcher here */}
               </div>
             </div>

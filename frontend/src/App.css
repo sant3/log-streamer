@@ -38,7 +38,8 @@
 }
 
 
-body, html {
+body,
+html {
   margin: 0;
   padding: 0;
   height: 100%;
@@ -100,7 +101,8 @@ body, html {
 }
 
 .server-list li.active {
-  background-color: #3b82f6; /* Keep active server highlight distinct */
+  background-color: #3b82f6;
+  /* Keep active server highlight distinct */
   font-weight: bold;
 }
 
@@ -126,7 +128,8 @@ body, html {
   height: 100vh;
   display: flex;
   transition: padding-left 0.3s ease;
-  padding-left: 0; /* Default no padding */
+  padding-left: 0;
+  /* Default no padding */
 }
 
 .app-wrapper.panel-open .main-content {
@@ -145,6 +148,7 @@ body, html {
   cursor: pointer;
   border-radius: 5px;
   transition: left 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+
   &:hover {
     font-weight: bold;
     color: #2ecc71;
@@ -152,7 +156,8 @@ body, html {
 }
 
 .app-wrapper.panel-open .panel-toggle {
-  left: 250px; /* Position next to the open panel */
+  left: 250px;
+  /* Position next to the open panel */
 }
 
 .container {
@@ -201,10 +206,12 @@ body, html {
   display: flex;
   flex-wrap: wrap;
   margin-top: 10px;
-  align-items: flex-end; /* Align items to the bottom */
+  align-items: flex-end;
+  /* Align items to the bottom */
 }
 
-.header button, .header label {
+.header button,
+.header label {
   padding: 8px 12px;
   margin-right: 5px;
   margin-bottom: 5px;
@@ -258,8 +265,10 @@ body, html {
   color: var(--header-text-color);
   cursor: pointer;
   padding: 0;
-  margin-left: auto; /* Push to the right */
-  margin-bottom: 5px; /* Align with other buttons */
+  margin-left: auto;
+  /* Push to the right */
+  margin-bottom: 5px;
+  /* Align with other buttons */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -267,13 +276,17 @@ body, html {
 }
 
 .theme-switcher-button:hover {
-  color: #2ecc71; /* A distinct hover color */
+  color: #2ecc71;
+  /* A distinct hover color */
 }
 
 .theme-switcher-button svg {
-  width: 20px; /* Make it smaller */
-  height: 20px; /* Make it smaller */
-  fill: currentColor; /* Ensures the SVG uses the button's text color */
+  width: 20px;
+  /* Make it smaller */
+  height: 20px;
+  /* Make it smaller */
+  fill: currentColor;
+  /* Ensures the SVG uses the button's text color */
 }
 
 .loading-message {
@@ -299,7 +312,8 @@ body, html {
 
 .loader-spinner {
   border: 8px solid var(--background-color);
-  border-top: 8px solid #3b82f6; /* Blue accent color */
+  border-top: 8px solid #3b82f6;
+  /* Blue accent color */
   border-radius: 50%;
   width: 60px;
   height: 60px;
@@ -307,8 +321,13 @@ body, html {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Autocomplete Styles */
@@ -346,4 +365,53 @@ body, html {
 
 .suggestions-list li.active {
   background-color: var(--button-hover-bg-color);
+}
+
+/* Streaming Indicator Styles */
+.streaming-indicator {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  z-index: 10;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  margin-right: 10px;
+  margin-bottom: 12px;
+}
+
+.streaming-indicator.active {
+  background-color: #2ecc71;
+  /* Green */
+  box-shadow: 0 0 15px #2ecc71;
+  animation: pulse-green 2s infinite;
+}
+
+.streaming-indicator.inactive {
+  background-color: #e74c3c;
+  /* Red */
+  box-shadow: 0 0 10px #e74c3c;
+}
+
+@keyframes pulse-green {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7);
+  }
+
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 10px rgba(46, 204, 113, 0);
+  }
+
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(46, 204, 113, 0);
+  }
+}
+
+/* Ensure the log-container is relative for positioning the indicator */
+.log-container {
+  position: relative;
 }
