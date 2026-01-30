@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import './App.css';
-import ThemeSwitcher from './components/ThemeSwitcher'; // Import the ThemeSwitcher component
-import Loader from './components/Loader'; // Import the Loader component
+import ThemeSwitcher from './components/ThemeSwitcher';
+import Loader from './components/Loader';
 
 const getQueryParam = (param) => {
   const queryParams = new URLSearchParams(window.location.search);
@@ -27,7 +27,7 @@ const getFileNameQueryParam = () => {
 const POLLING_ALIVE_MS = 10000;
 
 function App() {
-  const [theme, setTheme] = useState('dark'); // Initialize theme state to 'dark'
+  const [theme, setTheme] = useState('dark');
   const [logs, setLogs] = useState([]);
   const [logFile, setLogFile] = useState('');
   const [error, setError] = useState('');
@@ -37,8 +37,9 @@ function App() {
   const logContainerRef = useRef(null);
   const [autoScroll, setAutoScroll] = useState(true);
   const [availableLogFiles, setAvailableLogFiles] = useState([]);
-  const [isLoadingServers, setIsLoadingServers] = useState(false); // New state for loader
-  const [isStreaming, setIsStreaming] = useState(false); // New state for streaming status
+  const [isLoadingServers, setIsLoadingServers] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [highlightText, setHighlightText] = useState('');
 
   // New state for side panel and servers
   const [isPanelOpen, setIsPanelOpen] = useState(true);
@@ -279,6 +280,15 @@ function App() {
       setFontSize(fontSize - 2);
   };
   const toggleLineNumbers = () => setShowLineNumbers(!showLineNumbers);
+  const renderLogMessage = (text) => {
+    if (!highlightText.trim()) return text;
+    const regex = new RegExp(`(${highlightText.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')})`, 'gi');
+    const parts = text.split(regex);
+    return parts.map((part, i) =>
+      part.toLowerCase() === highlightText.toLowerCase() ?
+        <span key={i} className="log-highlight">{part}</span> : part
+    );
+  };
 
   useEffect(() => {
     if (autoScroll) {
@@ -365,7 +375,14 @@ function App() {
                   Auto-Scroll
                 </label>
                 <div className={`streaming-indicator ${isStreaming ? 'active' : 'inactive'}`} title={isStreaming ? 'Streaming Active' : 'Streaming Inactive'}></div>
-                <ThemeSwitcher theme={theme} toggleTheme={toggleTheme} /> {/* Moved ThemeSwitcher here */}
+                <input
+                  type="text"
+                  value={highlightText}
+                  onChange={(e) => setHighlightText(e.target.value)}
+                  placeholder="Highlight..."
+                  className="highlight-input"
+                />
+                <ThemeSwitcher theme={theme} toggleTheme={toggleTheme} /> { }
               </div>
             </div>
           </div>
@@ -374,7 +391,7 @@ function App() {
             {logs.map((log, index) => (
               <div key={index} className="log-message">
                 {showLineNumbers && <span className="line-number">{index + 1}. </span>}
-                {log}
+                {renderLogMessage(log)}
               </div>
             ))}
           </div>

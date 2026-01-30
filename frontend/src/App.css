@@ -16,6 +16,8 @@
   --input-text-color: #111;
   --panel-toggle-bg-color: #e0e0e0;
   --panel-toggle-color: #111;
+  --highlight-bg: #ffeb3b;
+  --highlight-text: #000;
 }
 
 /* Dark Theme */
@@ -35,6 +37,8 @@
   --input-text-color: #e0e0e0;
   --panel-toggle-bg-color: #20232a;
   --panel-toggle-color: #e0e0e0;
+  --highlight-bg: #f1c40f;
+  --highlight-text: #000;
 }
 
 
@@ -206,14 +210,13 @@ html {
   display: flex;
   flex-wrap: wrap;
   margin-top: 10px;
-  align-items: flex-end;
-  /* Align items to the bottom */
+  align-items: center;
 }
 
 .header button,
 .header label {
   padding: 8px 12px;
-  margin-right: 5px;
+  margin-right: 8px;
   margin-bottom: 5px;
   background-color: var(--button-bg-color);
   color: var(--header-text-color);
@@ -222,6 +225,8 @@ html {
   cursor: pointer;
   display: inline-flex;
   align-items: center;
+  height: 36px;
+  box-sizing: border-box;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -277,16 +282,12 @@ html {
 
 .theme-switcher-button:hover {
   color: #2ecc71;
-  /* A distinct hover color */
 }
 
 .theme-switcher-button svg {
   width: 20px;
-  /* Make it smaller */
   height: 20px;
-  /* Make it smaller */
   fill: currentColor;
-  /* Ensures the SVG uses the button's text color */
 }
 
 .loading-message {
@@ -296,7 +297,6 @@ html {
   font-style: italic;
 }
 
-/* New Loader Styles */
 .loader-overlay {
   position: fixed;
   top: 0;
@@ -313,7 +313,6 @@ html {
 .loader-spinner {
   border: 8px solid var(--background-color);
   border-top: 8px solid #3b82f6;
-  /* Blue accent color */
   border-radius: 50%;
   width: 60px;
   height: 60px;
@@ -377,8 +376,9 @@ html {
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
   z-index: 10;
   border: 2px solid rgba(255, 255, 255, 0.2);
-  margin-right: 10px;
-  margin-bottom: 12px;
+  margin-right: 12px;
+  margin-bottom: 5px;
+  /* Unified margin */
 }
 
 .streaming-indicator.active {
@@ -414,4 +414,30 @@ html {
 /* Ensure the log-container is relative for positioning the indicator */
 .log-container {
   position: relative;
+}
+
+.header .button-group .highlight-input {
+  padding: 8px 12px;
+  /* Match button padding */
+  border-radius: 4px;
+  border: none;
+  background-color: var(--input-bg-color);
+  color: var(--input-text-color);
+  margin-right: 8px;
+  margin-bottom: 5px;
+  /* Unified margin */
+  width: 260px;
+  /* Keep your requested width */
+  height: 36px;
+  /* Match button height */
+  box-sizing: border-box;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.log-highlight {
+  background-color: var(--highlight-bg);
+  color: var(--highlight-text);
+  font-weight: bold;
+  border-radius: 2px;
+  padding: 0 2px;
 }
