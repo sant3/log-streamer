@@ -43,13 +43,13 @@ function App() {
   const [isPanelOpen, setIsPanelOpen] = useState(true);
   const [servers, setServers] = useState([]);
   const [serverStatuses, setServerStatuses] = useState({});
-  
+
   // Use a more descriptive name for the currently selected host
   const [activeHost, setActiveHost] = useState('');
 
   const queryFileName = getQueryParam('file');
 
-    // Autocomplete state
+  // Autocomplete state
   const [suggestions, setSuggestions] = useState([]);
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
@@ -82,7 +82,6 @@ function App() {
   }, [isInputFocused, logFile, availableLogFiles]);
 
 
-  // Function to toggle theme
   const toggleTheme = () => {
     setTheme((prevTheme) => (prevTheme === 'dark' ? 'light' : 'dark'));
   };
@@ -272,7 +271,7 @@ function App() {
       setFontSize(fontSize + 2);
   }
   const decreaseFontSize = () => {
-    if (fontSize > 10) 
+    if (fontSize > 10)
       setFontSize(fontSize - 2);
   };
   const toggleLineNumbers = () => setShowLineNumbers(!showLineNumbers);
@@ -314,7 +313,7 @@ function App() {
       <div className="main-content">
         <div className="container">
           <div className="header">
-            <div style={{display: 'flex', alignItems: 'center'}}>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
               <img src={process.env.PUBLIC_URL + '/main_logo.svg'} alt="Log Streamer Logo" className="main-logo" />
             </div>
             <div className="controls">
@@ -343,7 +342,7 @@ function App() {
                   </ul>
                 )}
               </div>
-              
+
               <div className="button-group">
                 <button onClick={handleStart}>Start</button>
                 <button onClick={handleStop}>Stop</button>
