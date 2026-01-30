@@ -1,7 +1,7 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import './App.css';
-import ThemeSwitcher from './components/ThemeSwitcher'; // Import the ThemeSwitcher component
-import Loader from './components/Loader'; // Import the Loader component
+import ThemeSwitcher from './components/ThemeSwitcher';
+import Loader from './components/Loader';
 
 const getQueryParam = (param) => {
   const queryParams = new URLSearchParams(window.location.search);
@@ -27,7 +27,7 @@ const getFileNameQueryParam = () => {
 const POLLING_ALIVE_MS = 10000;
 
 function App() {
-  const [theme, setTheme] = useState('dark'); // Initialize theme state to 'dark'
+  const [theme, setTheme] = useState('dark');
   const [logs, setLogs] = useState([]);
   const [logFile, setLogFile] = useState('');
   const [error, setError] = useState('');
@@ -37,7 +37,9 @@ function App() {
   const logContainerRef = useRef(null);
   const [autoScroll, setAutoScroll] = useState(true);
   const [availableLogFiles, setAvailableLogFiles] = useState([]);
-  const [isLoadingServers, setIsLoadingServers] = useState(false); // New state for loader
+  const [isLoadingServers, setIsLoadingServers] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [highlightText, setHighlightText] = useState('');
 
   // New state for side panel and servers
   const [isPanelOpen, setIsPanelOpen] = useState(true);
@@ -218,10 +220,12 @@ function App() {
       }
       setError('');
       setLogs((prevLogs) => [...prevLogs, event.data]);
+      setIsStreaming(true);
     };
     newEventSource.onerror = () => {
       console.error('EventSource failed.');
       setError('EventSource failed.');
+      setIsStreaming(false);
       newEventSource.close();
     };
     eventSourceRef.current = newEventSource;
@@ -254,6 +258,7 @@ function App() {
   const handleStop = () => {
     if (eventSourceRef.current) {
       eventSourceRef.current.close();
+      setIsStreaming(false);
     }
   };
 
@@ -275,6 +280,25 @@ function App() {
       setFontSize(fontSize - 2);
   };
   const toggleLineNumbers = () => setShowLineNumbers(!showLineNumbers);
+  const renderLogMessage = (text) => {
+    if (!highlightText.trim()) return text;
+    const regex = new RegExp(`(${highlightText.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')})`, 'gi');
+    const parts = text.split(regex);
+    return parts.map((part, i) =>
+      part.toLowerCase() === highlightText.toLowerCase() ?
+        <span key={i} className="log-highlight">{part}</span> : part
+    );
+  };
+
+  const matchCount = useMemo(() => {
+    if (!highlightText.trim() || logs.length === 0) return 0;
+    const escapedText = highlightText.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+    const regex = new RegExp(escapedText, 'gi');
+    return logs.reduce((acc, log) => {
+      const matches = log.match(regex);
+      return acc + (matches ? matches.length : 0);
+    }, 0);
+  }, [logs, highlightText]);
 
   useEffect(() => {
     if (autoScroll) {
@@ -360,7 +384,23 @@ function App() {
                   />
                   Auto-Scroll
                 </label>
-                <ThemeSwitcher theme={theme} toggleTheme={toggleTheme} /> {/* Moved ThemeSwitcher here */}
+                <div className={`streaming-indicator ${isStreaming ? 'active' : 'inactive'}`} title={isStreaming ? 'Streaming Active' : 'Streaming Inactive'}></div>
+                <div className="highlight-wrapper">
+                  <input
+                    type="text"
+                    value={highlightText}
+                    onChange={(e) => setHighlightText(e.target.value)}
+                    placeholder="Highlight..."
+                    className="highlight-input"
+                  />
+                  {highlightText && (
+                    <button className="clear-highlight" onClick={() => setHighlightText('')}>×</button>
+                  )}
+                  {highlightText.trim() && (
+                    <span className="highlight-count">{matchCount} matches</span>
+                  )}
+                </div>
+                <ThemeSwitcher theme={theme} toggleTheme={toggleTheme} /> { }
               </div>
             </div>
           </div>
@@ -369,7 +409,7 @@ function App() {
             {logs.map((log, index) => (
               <div key={index} className="log-message">
                 {showLineNumbers && <span className="line-number">{index + 1}. </span>}
-                {log}
+                {renderLogMessage(log)}
               </div>
             ))}
           </div>

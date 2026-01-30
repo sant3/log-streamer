@@ -2,6 +2,18 @@ The frontend is a React application that provides a web interface for viewing lo
 
 ![alt text](../img/preview.png)
 
+## Key Features
+
+- **Real-time Log Streaming**: Uses EventSource for low-latency log updates.
+- **Streaming Status Indicator**: A pulsing green/red dot in the toolbar shows the connection state at a glance.
+- **Advanced Log Highlighting**:
+  - **Live Search**: Highlight any text across all logs in real-time.
+  - **Match Counter**: Displays the total number of matches found *inside* the search box.
+  - **Quick Clear**: Integrated "×" button to reset the highlight.
+- **Theme Support**: Seamlessly switch between **Dark** and **Light** modes.
+- **Responsive Toolbar**: Clean, aligned controls for font size, line numbers, and auto-scroll.
+- **Multi-Server Support**: Collapsible side panel to switch between different backend instances.
+
 ## Requisites
 
 - **Node.js**

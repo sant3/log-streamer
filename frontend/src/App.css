@@ -16,6 +16,8 @@
   --input-text-color: #111;
   --panel-toggle-bg-color: #e0e0e0;
   --panel-toggle-color: #111;
+  --highlight-bg: #ffeb3b;
+  --highlight-text: #000;
 }
 
 /* Dark Theme */
@@ -35,10 +37,13 @@
   --input-text-color: #e0e0e0;
   --panel-toggle-bg-color: #20232a;
   --panel-toggle-color: #e0e0e0;
+  --highlight-bg: #f1c40f;
+  --highlight-text: #000;
 }
 
 
-body, html {
+body,
+html {
   margin: 0;
   padding: 0;
   height: 100%;
@@ -100,7 +105,8 @@ body, html {
 }
 
 .server-list li.active {
-  background-color: #3b82f6; /* Keep active server highlight distinct */
+  background-color: #3b82f6;
+  /* Keep active server highlight distinct */
   font-weight: bold;
 }
 
@@ -126,7 +132,8 @@ body, html {
   height: 100vh;
   display: flex;
   transition: padding-left 0.3s ease;
-  padding-left: 0; /* Default no padding */
+  padding-left: 0;
+  /* Default no padding */
 }
 
 .app-wrapper.panel-open .main-content {
@@ -145,6 +152,7 @@ body, html {
   cursor: pointer;
   border-radius: 5px;
   transition: left 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+
   &:hover {
     font-weight: bold;
     color: #2ecc71;
@@ -152,7 +160,8 @@ body, html {
 }
 
 .app-wrapper.panel-open .panel-toggle {
-  left: 250px; /* Position next to the open panel */
+  left: 250px;
+  /* Position next to the open panel */
 }
 
 .container {
@@ -201,12 +210,13 @@ body, html {
   display: flex;
   flex-wrap: wrap;
   margin-top: 10px;
-  align-items: flex-end; /* Align items to the bottom */
+  align-items: center;
 }
 
-.header button, .header label {
+.header button,
+.header label {
   padding: 8px 12px;
-  margin-right: 5px;
+  margin-right: 8px;
   margin-bottom: 5px;
   background-color: var(--button-bg-color);
   color: var(--header-text-color);
@@ -215,6 +225,8 @@ body, html {
   cursor: pointer;
   display: inline-flex;
   align-items: center;
+  height: 36px;
+  box-sizing: border-box;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -258,8 +270,10 @@ body, html {
   color: var(--header-text-color);
   cursor: pointer;
   padding: 0;
-  margin-left: auto; /* Push to the right */
-  margin-bottom: 5px; /* Align with other buttons */
+  margin-left: auto;
+  /* Push to the right */
+  margin-bottom: 5px;
+  /* Align with other buttons */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -267,13 +281,13 @@ body, html {
 }
 
 .theme-switcher-button:hover {
-  color: #2ecc71; /* A distinct hover color */
+  color: #2ecc71;
 }
 
 .theme-switcher-button svg {
-  width: 20px; /* Make it smaller */
-  height: 20px; /* Make it smaller */
-  fill: currentColor; /* Ensures the SVG uses the button's text color */
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
 }
 
 .loading-message {
@@ -283,7 +297,6 @@ body, html {
   font-style: italic;
 }
 
-/* New Loader Styles */
 .loader-overlay {
   position: fixed;
   top: 0;
@@ -299,7 +312,7 @@ body, html {
 
 .loader-spinner {
   border: 8px solid var(--background-color);
-  border-top: 8px solid #3b82f6; /* Blue accent color */
+  border-top: 8px solid #3b82f6;
   border-radius: 50%;
   width: 60px;
   height: 60px;
@@ -307,8 +320,13 @@ body, html {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Autocomplete Styles */
@@ -346,4 +364,124 @@ body, html {
 
 .suggestions-list li.active {
   background-color: var(--button-hover-bg-color);
+}
+
+/* Streaming Indicator Styles */
+.streaming-indicator {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  z-index: 10;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  margin-right: 12px;
+  margin-bottom: 5px;
+  /* Unified margin */
+}
+
+.streaming-indicator.active {
+  background-color: #2ecc71;
+  /* Green */
+  box-shadow: 0 0 15px #2ecc71;
+  animation: pulse-green 2s infinite;
+}
+
+.streaming-indicator.inactive {
+  background-color: #e74c3c;
+  /* Red */
+  box-shadow: 0 0 10px #e74c3c;
+}
+
+@keyframes pulse-green {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7);
+  }
+
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 10px rgba(46, 204, 113, 0);
+  }
+
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(46, 204, 113, 0);
+  }
+}
+
+/* Ensure the log-container is relative for positioning the indicator */
+.log-container {
+  position: relative;
+}
+
+.highlight-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-right: 8px;
+  margin-bottom: 5px;
+}
+
+.header .button-group .highlight-input {
+  padding: 8px 90px 8px 12px;
+  /* Increased right padding */
+  border-radius: 4px;
+  border: none;
+  background-color: var(--input-bg-color);
+  color: var(--input-text-color);
+  width: 260px;
+  height: 36px;
+  box-sizing: border-box;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.clear-highlight {
+  position: absolute;
+  right: 5px;
+  background: transparent !important;
+  /* Force transparent */
+  border: none !important;
+  color: var(--input-text-color);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+  height: 26px !important;
+  /* Smaller height */
+  width: 26px !important;
+  z-index: 2;
+}
+
+.clear-highlight:hover {
+  opacity: 1;
+  color: #e74c3c !important;
+  background: transparent !important;
+}
+
+.highlight-count {
+  position: absolute;
+  right: 30px;
+  /* Position before the X button */
+  font-size: 10px;
+  color: var(--input-text-color);
+  opacity: 0.7;
+  white-space: nowrap;
+  pointer-events: none;
+  /* Don't interfere with typing */
+  z-index: 1;
+}
+
+.log-highlight {
+  background-color: var(--highlight-bg);
+  color: var(--highlight-text);
+  font-weight: bold;
+  border-radius: 2px;
+  padding: 0 2px;
 }
