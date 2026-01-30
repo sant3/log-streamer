@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import './App.css';
 import ThemeSwitcher from './components/ThemeSwitcher';
 import Loader from './components/Loader';
@@ -290,6 +290,16 @@ function App() {
     );
   };
 
+  const matchCount = useMemo(() => {
+    if (!highlightText.trim() || logs.length === 0) return 0;
+    const escapedText = highlightText.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+    const regex = new RegExp(escapedText, 'gi');
+    return logs.reduce((acc, log) => {
+      const matches = log.match(regex);
+      return acc + (matches ? matches.length : 0);
+    }, 0);
+  }, [logs, highlightText]);
+
   useEffect(() => {
     if (autoScroll) {
       if (logContainerRef.current) {
@@ -375,13 +385,21 @@ function App() {
                   Auto-Scroll
                 </label>
                 <div className={`streaming-indicator ${isStreaming ? 'active' : 'inactive'}`} title={isStreaming ? 'Streaming Active' : 'Streaming Inactive'}></div>
-                <input
-                  type="text"
-                  value={highlightText}
-                  onChange={(e) => setHighlightText(e.target.value)}
-                  placeholder="Highlight..."
-                  className="highlight-input"
-                />
+                <div className="highlight-wrapper">
+                  <input
+                    type="text"
+                    value={highlightText}
+                    onChange={(e) => setHighlightText(e.target.value)}
+                    placeholder="Highlight..."
+                    className="highlight-input"
+                  />
+                  {highlightText && (
+                    <button className="clear-highlight" onClick={() => setHighlightText('')}>×</button>
+                  )}
+                  {highlightText.trim() && (
+                    <span className="highlight-count">{matchCount} matches</span>
+                  )}
+                </div>
                 <ThemeSwitcher theme={theme} toggleTheme={toggleTheme} /> { }
               </div>
             </div>

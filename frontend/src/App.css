@@ -416,22 +416,66 @@ html {
   position: relative;
 }
 
+.highlight-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  margin-right: 8px;
+  margin-bottom: 5px;
+}
+
 .header .button-group .highlight-input {
-  padding: 8px 12px;
-  /* Match button padding */
+  padding: 8px 90px 8px 12px;
+  /* Increased right padding */
   border-radius: 4px;
   border: none;
   background-color: var(--input-bg-color);
   color: var(--input-text-color);
-  margin-right: 8px;
-  margin-bottom: 5px;
-  /* Unified margin */
   width: 260px;
-  /* Keep your requested width */
   height: 36px;
-  /* Match button height */
   box-sizing: border-box;
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.clear-highlight {
+  position: absolute;
+  right: 5px;
+  background: transparent !important;
+  /* Force transparent */
+  border: none !important;
+  color: var(--input-text-color);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+  height: 26px !important;
+  /* Smaller height */
+  width: 26px !important;
+  z-index: 2;
+}
+
+.clear-highlight:hover {
+  opacity: 1;
+  color: #e74c3c !important;
+  background: transparent !important;
+}
+
+.highlight-count {
+  position: absolute;
+  right: 30px;
+  /* Position before the X button */
+  font-size: 10px;
+  color: var(--input-text-color);
+  opacity: 0.7;
+  white-space: nowrap;
+  pointer-events: none;
+  /* Don't interfere with typing */
+  z-index: 1;
 }
 
 .log-highlight {
