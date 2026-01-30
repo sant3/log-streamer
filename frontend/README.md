@@ -102,7 +102,6 @@ This will launch the test runner in interactive watch mode.
 
 ## TODO
 
-* config to enable/disable autocomplete
 * clean up code
 * add support for basic auth
 * complete support for jwt token
