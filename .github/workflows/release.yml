@@ -42,13 +42,10 @@ jobs:
         env:
           GOOS: ${{ matrix.goos }}
           GOARCH: ${{ matrix.goarch }}
+          BINARY_EXT: ${{ matrix.ext }}
         run: |
           go build -ldflags "-X main.buildDate=$(date +%Y/%m/%d)" \
             -o "file-streamer-${GOOS}${BINARY_EXT}" .
-        env:
-          GOOS: ${{ matrix.goos }}
-          GOARCH: ${{ matrix.goarch }}
-          BINARY_EXT: ${{ matrix.ext }}
 
       - name: Archive (tar.gz)
         if: matrix.archive == 'tar.gz'
