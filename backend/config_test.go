@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestDefaultConfig(t *testing.T) {
+func TestConfigDefaultConfig(t *testing.T) {
 	cfg := DefaultConfig()
 
 	if cfg.Port != 5005 {
@@ -30,7 +30,7 @@ func TestDefaultConfig(t *testing.T) {
 	}
 }
 
-func TestApplyEnvOverrides_AllFields(t *testing.T) {
+func TestConfigApplyEnvOverrides_AllFields(t *testing.T) {
 	t.Setenv("STREAMER_PORT", "9090")
 	t.Setenv("STREAMER_HTTPS_PORT", "9443")
 	t.Setenv("STREAMER_ENABLE_HTTPS", "false")
@@ -79,7 +79,7 @@ func TestApplyEnvOverrides_AllFields(t *testing.T) {
 	}
 }
 
-func TestApplyEnvOverrides_HTTPSVariations(t *testing.T) {
+func TestConfigApplyEnvOverrides_HTTPSVariations(t *testing.T) {
 	tests := []struct {
 		envValue string
 		expected bool
@@ -106,7 +106,7 @@ func TestApplyEnvOverrides_HTTPSVariations(t *testing.T) {
 	}
 }
 
-func TestApplyEnvOverrides_PartialOverride(t *testing.T) {
+func TestConfigApplyEnvOverrides_PartialOverride(t *testing.T) {
 	t.Setenv("STREAMER_PORT", "7070")
 
 	cfg := DefaultConfig()
