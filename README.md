@@ -38,5 +38,4 @@ You can also build for a specific platform:
 -   `make dist-be-windows`
 
 ### TODO
-* add BE for x32 ARCH
 * finish create automatically self-signed certs for agent

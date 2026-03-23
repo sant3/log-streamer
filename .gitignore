@@ -87,4 +87,3 @@ coverage/
 
 # FE dep
 frontend/package-lock.json
-frontend/pnpm-lock.yaml
