@@ -11,10 +11,24 @@ import (
 	"testing"
 )
 
-// Note: We use the real setupRouter from main.go to ensure tests run against the actual configuration.
+// testConfig returns a Config suitable for testing.
+func testConfig() *Config {
+	return &Config{
+		Port:        5005,
+		HTTPSPort:   8443,
+		EnableHTTPS: false,
+		CertPath:    "",
+		KeyPath:     "",
+		LogsDir:     ".",
+		CORSOrigins: []string{"http://localhost:3000"},
+		AllowedIPs:  map[string]bool{},
+		JWTSecret:   []byte("test-secret"),
+	}
+}
 
 func TestAliveHandler(t *testing.T) {
-	router := setupRouter()
+	cfg := testConfig()
+	router := setupRouter(cfg)
 	req, _ := http.NewRequest("GET", "/alive", nil)
 
 	rr := httptest.NewRecorder()
@@ -24,7 +38,6 @@ func TestAliveHandler(t *testing.T) {
 		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
 	}
 
-	// The handler now returns "OK" without a newline
 	expected := "OK"
 	if strings.TrimSpace(rr.Body.String()) != expected {
 		t.Errorf("handler returned unexpected body: got %q want %q", rr.Body.String(), expected)
@@ -32,8 +45,9 @@ func TestAliveHandler(t *testing.T) {
 }
 
 func TestVersionHandler(t *testing.T) {
-	router := setupRouter()
-	// Set dummy version info for the test
+	cfg := testConfig()
+	router := setupRouter(cfg)
+
 	originalVersion := version
 	originalBuildDate := buildDate
 	version = "test-1.0"
@@ -69,9 +83,8 @@ func TestListFilesHandler(t *testing.T) {
 	}
 	defer os.RemoveAll(tempDir)
 
-	originalLogsDir := logsDir
-	logsDir = tempDir
-	defer func() { logsDir = originalLogsDir }()
+	cfg := testConfig()
+	cfg.LogsDir = tempDir
 
 	expectedFiles := []string{"test1.log", "test2.log"}
 	for _, f := range expectedFiles {
@@ -83,7 +96,7 @@ func TestListFilesHandler(t *testing.T) {
 		t.Fatalf("could not create temp file: %v", err)
 	}
 
-	router := setupRouter()
+	router := setupRouter(cfg)
 	req, _ := http.NewRequest("GET", "/list-files", nil)
 	rr := httptest.NewRecorder()
 	router.ServeHTTP(rr, req)
@@ -113,7 +126,8 @@ func TestListFilesHandler(t *testing.T) {
 }
 
 func TestStreamLogsHandler_FileNotFound(t *testing.T) {
-	router := setupRouter()
+	cfg := testConfig()
+	router := setupRouter(cfg)
 	req, _ := http.NewRequest("GET", "/stream-logs?file=nonexistent.log", nil)
 	rr := httptest.NewRecorder()
 	router.ServeHTTP(rr, req)
@@ -127,3 +141,48 @@ func TestStreamLogsHandler_FileNotFound(t *testing.T) {
 		t.Errorf("handler returned unexpected body: got %q want %q", rr.Body.String(), expectedError)
 	}
 }
+
+func TestSetupRouter_AllRoutes(t *testing.T) {
+	cfg := testConfig()
+	router := setupRouter(cfg)
+
+	routes := []struct {
+		method string
+		path   string
+		expect int
+	}{
+		{"GET", "/alive", http.StatusOK},
+		{"GET", "/version", http.StatusOK},
+	}
+
+	for _, rt := range routes {
+		req := httptest.NewRequest(rt.method, rt.path, nil)
+		rr := httptest.NewRecorder()
+		router.ServeHTTP(rr, req)
+		if rr.Code != rt.expect {
+			t.Errorf("%s %s: expected status %d, got %d", rt.method, rt.path, rt.expect, rr.Code)
+		}
+	}
+}
+
+func TestSetupRouter_CORSOnEndpoints(t *testing.T) {
+	cfg := testConfig()
+	cfg.CORSOrigins = []string{"http://myapp.com"}
+	router := setupRouter(cfg)
+
+	endpoints := []string{"/alive", "/version", "/list-files"}
+	for _, ep := range endpoints {
+		req := httptest.NewRequest("OPTIONS", ep, nil)
+		req.Header.Set("Origin", "http://myapp.com")
+		rr := httptest.NewRecorder()
+		router.ServeHTTP(rr, req)
+
+		if rr.Code != http.StatusOK {
+			t.Errorf("OPTIONS %s: expected 200, got %d", ep, rr.Code)
+		}
+		if rr.Header().Get("Access-Control-Allow-Origin") != "http://myapp.com" {
+			t.Errorf("OPTIONS %s: expected CORS origin header, got %q", ep, rr.Header().Get("Access-Control-Allow-Origin"))
+		}
+	}
+}
+
