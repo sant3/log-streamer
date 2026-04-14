@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Log Streamer - Real-Time Server Log Streaming</title>
+  <meta name="description" content="A full-stack open-source tool for real-time server log file streaming. Built with Go and React.">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Log Streamer">
+  <meta property="og:description" content="Real-time server log streaming with Go and React. Multi-server support, JWT auth, search highlighting, dark/light themes.">
+  <meta property="og:image" content="https://sant3.github.io/log-streamer/img/preview.png">
+  <meta property="og:url" content="https://sant3.github.io/log-streamer/">
+  <meta property="og:type" content="website">
+
+  <!-- Favicon (inline SVG terminal icon) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2358a6ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='4 17 10 11 4 5'/><line x1='12' y1='19' x2='20' y2='19'/></svg>">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ===== Header ===== -->
+  <header class="header">
+    <nav class="nav container">
+      <a href="#" class="nav-brand">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="4 17 10 11 4 5"/>
+          <line x1="12" y1="19" x2="20" y2="19"/>
+        </svg>
+        Log Streamer
+      </a>
+      <ul class="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#techstack">Tech Stack</a></li>
+        <li><a href="#quickstart">Quick Start</a></li>
+        <li><a href="https://github.com/sant3/log-streamer" target="_blank" rel="noopener">GitHub</a></li>
+        <li><span class="version-badge">v1.2.0</span></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- ===== Hero ===== -->
+  <section class="hero">
+    <div class="container">
+      <h1 class="animate-in">Real-Time<br><span class="gradient">Server Log Streaming</span></h1>
+      <p class="hero-subtitle animate-in">
+        A full-stack tool for streaming, searching, and monitoring log files across multiple servers. Built with Go and React.
+      </p>
+      <div class="hero-cta animate-in">
+        <a href="#quickstart" class="btn btn-primary">Get Started</a>
+        <a href="https://github.com/sant3/log-streamer" class="btn btn-secondary" target="_blank" rel="noopener">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          View on GitHub
+        </a>
+      </div>
+      <div class="hero-badges animate-in">
+        <span class="badge">MIT License</span>
+        <span class="badge">Go 1.22</span>
+        <span class="badge">React 18</span>
+        <span class="badge">Cross-Platform</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Screenshot ===== -->
+  <section class="screenshot container animate-in">
+    <div class="screenshot-wrapper">
+      <img src="img/preview.png" alt="Log Streamer interface showing real-time log streaming with syntax highlighting, multi-server panel, and control toolbar" width="1919" height="728" loading="eager">
+    </div>
+  </section>
+
+  <!-- ===== Features ===== -->
+  <section class="section" id="features">
+    <div class="container">
+      <h2 class="section-title animate-in">Features</h2>
+      <p class="section-subtitle animate-in">Everything you need to monitor and analyze logs across your infrastructure.</p>
+      <div class="features-grid">
+
+        <div class="feature-card animate-in">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+          </svg>
+          <h3>Real-Time Streaming</h3>
+          <p>Server-Sent Events (SSE) based live log tailing with instant updates as new lines are written.</p>
+        </div>
+
+        <div class="feature-card animate-in">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="8" rx="2" ry="2"/>
+            <rect x="2" y="14" width="20" height="8" rx="2" ry="2"/>
+            <line x1="6" y1="6" x2="6.01" y2="6"/>
+            <line x1="6" y1="18" x2="6.01" y2="18"/>
+          </svg>
+          <h3>Multi-Server Support</h3>
+          <p>Connect to multiple backend instances simultaneously with real-time status monitoring for each server.</p>
+        </div>
+
+        <div class="feature-card animate-in">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <h3>Smart Search</h3>
+          <p>Advanced text highlighting with a live match counter. Quickly find what matters in thousands of log lines.</p>
+        </div>
+
+        <div class="feature-card animate-in">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          <h3>Security Built-In</h3>
+          <p>JWT authentication, IP whitelist, CORS middleware, and TLS/HTTPS support out of the box.</p>
+        </div>
+
+        <div class="feature-card animate-in">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+          <h3>Dark &amp; Light Themes</h3>
+          <p>Toggle between dark and light modes for comfortable viewing in any environment.</p>
+        </div>
+
+        <div class="feature-card animate-in">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+            <line x1="8" y1="21" x2="16" y2="21"/>
+            <line x1="12" y1="17" x2="12" y2="21"/>
+          </svg>
+          <h3>Cross-Platform</h3>
+          <p>Pre-built binaries for Linux, macOS, and Windows. Deploy anywhere with a single command.</p>
+        </div>
+
+        <div class="feature-card animate-in">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="4" y1="21" x2="4" y2="14"/>
+            <line x1="4" y1="10" x2="4" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12" y2="3"/>
+            <line x1="20" y1="21" x2="20" y2="16"/>
+            <line x1="20" y1="12" x2="20" y2="3"/>
+            <line x1="1" y1="14" x2="7" y2="14"/>
+            <line x1="9" y1="8" x2="15" y2="8"/>
+            <line x1="17" y1="16" x2="23" y2="16"/>
+          </svg>
+          <h3>Zero-Rebuild Config</h3>
+          <p>Configure servers at runtime via <code>servers.js</code>, CLI flags, or <code>STREAMER_*</code> environment variables.</p>
+        </div>
+
+        <div class="feature-card animate-in">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="17 1 21 5 17 9"/>
+            <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+            <polyline points="7 23 3 19 7 15"/>
+            <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+          </svg>
+          <h3>Auto-Scroll &amp; Controls</h3>
+          <p>Font size adjustment, line number toggle, and smart auto-scroll that pauses when you scroll up.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Tech Stack ===== -->
+  <section class="section" id="techstack" style="background: var(--bg-secondary);">
+    <div class="container">
+      <h2 class="section-title animate-in">Tech Stack</h2>
+      <p class="section-subtitle animate-in">Simple, proven technologies. Minimal dependencies.</p>
+      <div class="tech-grid">
+        <div class="tech-column animate-in">
+          <h3>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            Backend
+          </h3>
+          <ul class="tech-list">
+            <li>Go 1.22.6</li>
+            <li>net/http standard library</li>
+            <li>Server-Sent Events (SSE)</li>
+            <li>JWT authentication</li>
+            <li>TLS / HTTPS</li>
+          </ul>
+        </div>
+        <div class="tech-column animate-in">
+          <h3>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            Frontend
+          </h3>
+          <ul class="tech-list">
+            <li>React 18</li>
+            <li>EventSource API</li>
+            <li>Custom Hooks architecture</li>
+            <li>pnpm package manager</li>
+            <li>Jest + Testing Library</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Quick Start ===== -->
+  <section class="section" id="quickstart">
+    <div class="container">
+      <h2 class="section-title animate-in">Quick Start</h2>
+      <p class="section-subtitle animate-in">Get up and running in under a minute.</p>
+      <div class="quickstart-steps">
+
+        <div class="step animate-in">
+          <div class="step-label">Step 1 &mdash; Clone</div>
+          <div class="code-block">
+            <span class="command">git clone</span> https://github.com/sant3/log-streamer.git<br>
+            <span class="command">cd</span> log-streamer
+          </div>
+        </div>
+
+        <div class="step animate-in">
+          <div class="step-label">Step 2 &mdash; Build</div>
+          <div class="code-block">
+            <span class="comment"># Build the backend (Linux, macOS, Windows)</span><br>
+            <span class="command">make</span> dist-be<br><br>
+            <span class="comment"># Build the frontend</span><br>
+            <span class="command">cd</span> frontend &amp;&amp; <span class="command">pnpm install</span> &amp;&amp; <span class="command">pnpm run build</span>
+          </div>
+        </div>
+
+        <div class="step animate-in">
+          <div class="step-label">Step 3 &mdash; Run</div>
+          <div class="code-block">
+            <span class="comment"># Start the backend agent</span><br>
+            <span class="command">cd</span> backend &amp;&amp; <span class="command">go run</span> . -logsDir=/var/log<br><br>
+            <span class="comment"># Or use environment variables</span><br>
+            STREAMER_LOGS_DIR=/var/log STREAMER_PORT=5005 <span class="command">go run</span> .
+          </div>
+        </div>
+
+        <div class="step animate-in">
+          <div class="step-label">Step 4 &mdash; Open</div>
+          <div class="code-block">
+            <span class="comment"># Open the frontend in your browser</span><br>
+            http://localhost:3000?host=localhost:5005
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== API ===== -->
+  <section class="section" id="api" style="background: var(--bg-secondary);">
+    <div class="container">
+      <h2 class="section-title animate-in">API Endpoints</h2>
+      <p class="section-subtitle animate-in">A simple REST API for health checks, file listing, and log streaming.</p>
+      <div class="api-table-wrapper animate-in">
+        <table class="api-table">
+          <thead>
+            <tr>
+              <th>Endpoint</th>
+              <th>Method</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>/alive</td>
+              <td>GET</td>
+              <td>Health check &mdash; returns 200 OK</td>
+            </tr>
+            <tr>
+              <td>/version</td>
+              <td>GET</td>
+              <td>Returns version and build date</td>
+            </tr>
+            <tr>
+              <td>/list-files</td>
+              <td>GET</td>
+              <td>Lists available .log files in the configured directory</td>
+            </tr>
+            <tr>
+              <td>/stream-logs</td>
+              <td>GET</td>
+              <td>SSE endpoint for real-time log streaming</td>
+            </tr>
+            <tr>
+              <td>/stop</td>
+              <td>POST</td>
+              <td>Gracefully shutdown the server</td>
+            </tr>
+            <tr>
+              <td>/restart</td>
+              <td>POST</td>
+              <td>Restart the server process</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Footer ===== -->
+  <footer class="footer">
+    <div class="container">
+      <nav class="footer-links">
+        <a href="https://github.com/sant3/log-streamer" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/sant3/log-streamer/releases" target="_blank" rel="noopener">Releases</a>
+        <a href="https://github.com/sant3/log-streamer/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>
+        <a href="https://github.com/sant3/log-streamer/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">Contributing</a>
+      </nav>
+      <p class="footer-copy">Log Streamer is open source under the MIT License. &copy; 2025 Sant3.</p>
+    </div>
+  </footer>
+
+  <!-- ===== Scroll Animations ===== -->
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.animate-in').forEach((el) => {
+      observer.observe(el);
+    });
+  </script>
+
+</body>
+</html>
