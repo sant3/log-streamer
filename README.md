@@ -5,6 +5,8 @@
 - **A Go backend:** A lightweight agent that monitors log files in a specified directory and serves them over an HTTP/S WebSocket connection.
 - **A React frontend:** A user-friendly web interface that connects to the backend, lists available log files, and displays their content as a live stream.
 
+The frontend can also **download the full content** of any `.log` file from the server with progress feedback and cancellation support.
+
 For detailed information on each component, please refer to their respective READMEs:
 
 - [Frontend README](./frontend/README.md)

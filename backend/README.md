@@ -83,6 +83,9 @@ go test
 - `/version` -> Returns the version and build date of the application.
 - `/list-files` -> Returns a JSON array of available `.log` file names in the `logsDir`.
 - `/stream-logs` -> Establishes a WebSocket connection to stream the content of a selected log file.
+- `/download-file?file=<name>` -> Streams the full content of a `.log` file from the configured logs directory as a binary attachment. The response sets `Content-Type: application/octet-stream`, `Content-Disposition: attachment; filename="<name>"`, and `Content-Length: <bytes>` so clients can track progress.
+  - **Query parameters:** `file` (required) — the log file name. Must be a basename (no path components) and must end in `.log`.
+  - **Errors:** `400` for missing `file`, invalid filename (path components, control chars, quotes), or non-`.log` extension; `404` if the file does not exist or is a directory.
 - `/stop` -> Sends a SIGTERM signal to gracefully shut down the application.
 - `/restart` -> Restarts the application by spawning a new child process.
 

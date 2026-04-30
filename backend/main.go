@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	version   = "0.0.1-SNAPSHOT"
+	version   = "1.2.1"
 	buildDate string
 )
 
@@ -40,6 +40,7 @@ func setupRouter(cfg *Config) *http.ServeMux {
 	mux.HandleFunc("/stop", StopHandler)
 	mux.HandleFunc("/version", cors(VersionHandler))
 	mux.HandleFunc("/list-files", cors(ListFilesHandler(cfg.LogsDir)))
+	mux.HandleFunc("/download-file", cors(DownloadFileHandler(cfg.LogsDir)))
 	return mux
 }
 

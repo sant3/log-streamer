@@ -2,9 +2,12 @@ package main
 
 import (
 	"context"
+	"crypto/sha256"
 	"encoding/json"
+	"io"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -312,4 +315,180 @@ func TestStreamLogsHandler_SSEHeaders(t *testing.T) {
 	if rr.Header().Get("Cache-Control") != "no-cache" {
 		t.Errorf("expected Cache-Control no-cache, got %q", rr.Header().Get("Cache-Control"))
 	}
+}
+
+// ----- DownloadFileHandler tests -----
+
+func newDownloadTestDir(t *testing.T) string {
+	t.Helper()
+	return t.TempDir()
+}
+
+func writeLogFile(t *testing.T, dir, name, contents string) {
+	t.Helper()
+	if err := os.WriteFile(filepath.Join(dir, name), []byte(contents), 0644); err != nil {
+		t.Fatalf("write file: %v", err)
+	}
+}
+
+func TestDownloadFileHandler_Success(t *testing.T) {
+	dir := newDownloadTestDir(t)
+	writeLogFile(t, dir, "app.log", "hello world\nline two\n")
+
+	req := httptest.NewRequest("GET", "/download-file?file=app.log", nil)
+	rr := httptest.NewRecorder()
+	DownloadFileHandler(dir)(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d (body=%q)", rr.Code, rr.Body.String())
+	}
+	if got := rr.Body.String(); got != "hello world\nline two\n" {
+		t.Errorf("body mismatch: %q", got)
+	}
+	if got := rr.Header().Get("Content-Type"); got != "application/octet-stream" {
+		t.Errorf("Content-Type = %q", got)
+	}
+	wantCD := `attachment; filename="app.log"`
+	if got := rr.Header().Get("Content-Disposition"); got != wantCD {
+		t.Errorf("Content-Disposition = %q, want %q", got, wantCD)
+	}
+	if got := rr.Header().Get("Content-Length"); got != "21" {
+		t.Errorf("Content-Length = %q, want 21", got)
+	}
+}
+
+func TestDownloadFileHandler_MissingFileParam(t *testing.T) {
+	dir := newDownloadTestDir(t)
+	req := httptest.NewRequest("GET", "/download-file", nil)
+	rr := httptest.NewRecorder()
+	DownloadFileHandler(dir)(rr, req)
+	if rr.Code != http.StatusBadRequest {
+		t.Fatalf("expected 400, got %d", rr.Code)
+	}
+}
+
+func TestDownloadFileHandler_PathTraversal(t *testing.T) {
+	dir := newDownloadTestDir(t)
+	cases := []string{
+		"../etc/passwd",
+		"..\\windows",
+		"/abs/path.log",
+		"subdir/file.log",
+	}
+	for _, name := range cases {
+		t.Run(name, func(t *testing.T) {
+			req := httptest.NewRequest("GET", "/download-file?file="+url.QueryEscape(name), nil)
+			rr := httptest.NewRecorder()
+			DownloadFileHandler(dir)(rr, req)
+			if rr.Code != http.StatusBadRequest {
+				t.Fatalf("expected 400 for %q, got %d", name, rr.Code)
+			}
+		})
+	}
+}
+
+func TestDownloadFileHandler_InvalidExtension(t *testing.T) {
+	dir := newDownloadTestDir(t)
+	cases := []string{"config.txt", "file"}
+	for _, name := range cases {
+		t.Run(name, func(t *testing.T) {
+			req := httptest.NewRequest("GET", "/download-file?file="+name, nil)
+			rr := httptest.NewRecorder()
+			DownloadFileHandler(dir)(rr, req)
+			if rr.Code != http.StatusBadRequest {
+				t.Fatalf("expected 400 for %q, got %d", name, rr.Code)
+			}
+		})
+	}
+}
+
+func TestDownloadFileHandler_FileNotFound(t *testing.T) {
+	dir := newDownloadTestDir(t)
+	req := httptest.NewRequest("GET", "/download-file?file=nonexistent.log", nil)
+	rr := httptest.NewRecorder()
+	DownloadFileHandler(dir)(rr, req)
+	if rr.Code != http.StatusNotFound {
+		t.Fatalf("expected 404, got %d", rr.Code)
+	}
+}
+
+func TestDownloadFileHandler_IsDirectory(t *testing.T) {
+	dir := newDownloadTestDir(t)
+	if err := os.Mkdir(filepath.Join(dir, "sub.log"), 0755); err != nil {
+		t.Fatal(err)
+	}
+	req := httptest.NewRequest("GET", "/download-file?file=sub.log", nil)
+	rr := httptest.NewRecorder()
+	DownloadFileHandler(dir)(rr, req)
+	if rr.Code != http.StatusNotFound {
+		t.Fatalf("expected 404 for directory, got %d", rr.Code)
+	}
+}
+
+func TestDownloadFileHandler_LargeFile(t *testing.T) {
+	dir := newDownloadTestDir(t)
+	const size = 10 * 1024 * 1024 // 10 MB
+	buf := make([]byte, size)
+	for i := range buf {
+		buf[i] = byte(i % 251)
+	}
+	if err := os.WriteFile(filepath.Join(dir, "big.log"), buf, 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	req := httptest.NewRequest("GET", "/download-file?file=big.log", nil)
+	rr := httptest.NewRecorder()
+	DownloadFileHandler(dir)(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d", rr.Code)
+	}
+	if rr.Body.Len() != size {
+		t.Fatalf("size mismatch: got %d, want %d", rr.Body.Len(), size)
+	}
+	got := sha256.Sum256(rr.Body.Bytes())
+	want := sha256.Sum256(buf)
+	if got != want {
+		t.Errorf("hash mismatch: got %x, want %x", got, want)
+	}
+}
+
+func TestDownloadFileHandler_ClientAbort(t *testing.T) {
+	dir := newDownloadTestDir(t)
+	const size = 50 * 1024 * 1024 // 50 MB
+	buf := make([]byte, size)
+	if err := os.WriteFile(filepath.Join(dir, "big.log"), buf, 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	srv := httptest.NewServer(http.HandlerFunc(DownloadFileHandler(dir)))
+	defer srv.Close()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, "GET", srv.URL+"/?file=big.log", nil)
+	if err != nil {
+		t.Fatalf("new request: %v", err)
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatalf("do: %v", err)
+	}
+	defer resp.Body.Close()
+
+	// Read a small prefix, then cancel mid-stream.
+	prefix := make([]byte, 4096)
+	if _, err := io.ReadFull(resp.Body, prefix); err != nil {
+		t.Fatalf("read prefix: %v", err)
+	}
+	cancel()
+
+	// Expect the next read to fail because the context was cancelled.
+	_, err = io.Copy(io.Discard, resp.Body)
+	if err == nil {
+		t.Fatalf("expected error after cancel, got nil (server may have buffered the whole response)")
+	}
+	// Test passes if the server didn't panic and returned the prefix successfully.
 }

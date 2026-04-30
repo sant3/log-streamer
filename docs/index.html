@@ -35,7 +35,7 @@
         <li><a href="#techstack">Tech Stack</a></li>
         <li><a href="#quickstart">Quick Start</a></li>
         <li><a href="https://github.com/sant3/log-streamer" target="_blank" rel="noopener">GitHub</a></li>
-        <li><span class="version-badge">v1.2.0</span></li>
+        <li><span class="version-badge">v1.2.1</span></li>
       </ul>
     </nav>
   </header>
@@ -83,6 +83,16 @@
           </svg>
           <h3>Real-Time Streaming</h3>
           <p>Server-Sent Events (SSE) based live log tailing with instant updates as new lines are written.</p>
+        </div>
+
+        <div class="feature-card animate-in">
+          <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          <h3>Download Log Files</h3>
+          <p>Save any monitored <code>.log</code> file to disk with live progress and one-click cancel; downloads run alongside an active stream without interfering.</p>
         </div>
 
         <div class="feature-card animate-in">
@@ -287,6 +297,11 @@
               <td>/stream-logs</td>
               <td>GET</td>
               <td>SSE endpoint for real-time log streaming</td>
+            </tr>
+            <tr>
+              <td>/download-file?file=&lt;name&gt;</td>
+              <td>GET</td>
+              <td>Streams a complete .log file as a binary attachment with Content-Length for progress tracking</td>
             </tr>
             <tr>
               <td>/stop</td>

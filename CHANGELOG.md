@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] - 2026-04-27
+
+### Added
+- New `GET /download-file?file=<name>` backend endpoint that streams a complete `.log` file as a binary attachment with `Content-Length` set for client-side progress tracking
+- New `useFileDownload` React hook using `fetch()` + `ReadableStream` + `AbortController`
+- Download / Cancel button in `LogControls`, showing live progress percentage and supporting cancellation; coexists with active streaming
+
 ## [Unreleased]
 
 ### Added

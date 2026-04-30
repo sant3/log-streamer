@@ -14,6 +14,10 @@ The frontend is a React application that provides a web interface for viewing lo
 - **Responsive Toolbar**: Clean, aligned controls for font size, line numbers, and auto-scroll.
 - **Multi-Server Support**: Collapsible side panel to switch between different backend instances.
 
+### Download
+
+The **Download** button next to *Clear* fetches the full contents of the log file currently in the input from the active server. While downloading, the button morphs into **Cancel (NN%)** showing live progress; clicking it aborts the transfer. Downloads run independently of any active stream — you can keep streaming the same or another file while a download is in progress.
+
 ## Requisites
 
 - **Node.js**
