@@ -186,3 +186,36 @@ func TestSetupRouter_CORSOnEndpoints(t *testing.T) {
 	}
 }
 
+func TestSetupRouter_DownloadFileRouteRegistered(t *testing.T) {
+	cfg := &Config{LogsDir: t.TempDir(), CORSOrigins: []string{"*"}}
+	mux := setupRouter(cfg)
+
+	req := httptest.NewRequest("GET", "/download-file", nil)
+	rr := httptest.NewRecorder()
+	mux.ServeHTTP(rr, req)
+
+	if rr.Code == http.StatusNotFound {
+		t.Fatalf("/download-file not registered (got 404 from mux)")
+	}
+	if rr.Code != http.StatusBadRequest {
+		t.Fatalf("expected 400 from handler, got %d", rr.Code)
+	}
+}
+
+func TestSetupRouter_DownloadFileCORSPreflight(t *testing.T) {
+	cfg := &Config{LogsDir: t.TempDir(), CORSOrigins: []string{"*"}}
+	mux := setupRouter(cfg)
+
+	req := httptest.NewRequest("OPTIONS", "/download-file", nil)
+	req.Header.Set("Origin", "http://example.com")
+	rr := httptest.NewRecorder()
+	mux.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("expected 200 for OPTIONS preflight, got %d", rr.Code)
+	}
+	if got := rr.Header().Get("Access-Control-Allow-Origin"); got != "*" {
+		t.Errorf("Access-Control-Allow-Origin = %q, want *", got)
+	}
+}
+

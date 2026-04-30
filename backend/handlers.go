@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -142,6 +143,60 @@ func ListFilesHandler(logsDirPath string) http.HandlerFunc {
 		}
 
 		w.Write(jsonResponse)
+	}
+}
+
+// DownloadFileHandler returns an HTTP handler that serves the full content of
+// a selected .log file as a binary attachment. It applies the same filename
+// validation as StreamLogsHandler.
+func DownloadFileHandler(logsDirPath string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		fileName := r.URL.Query().Get("file")
+		if fileName == "" {
+			http.Error(w, "Error: 'file' query parameter is required", http.StatusBadRequest)
+			return
+		}
+
+		if filepath.Base(fileName) != fileName {
+			http.Error(w, "Invalid file name", http.StatusBadRequest)
+			return
+		}
+		if !strings.HasSuffix(fileName, ".log") {
+			http.Error(w, "Only .log files are allowed", http.StatusBadRequest)
+			return
+		}
+		for i := 0; i < len(fileName); i++ {
+			b := fileName[i]
+			if b == '"' || b == '\\' || b < 0x20 || b == 0x7F {
+				http.Error(w, "Invalid file name", http.StatusBadRequest)
+				return
+			}
+		}
+
+		fullPath := filepath.Join(logsDirPath, fileName)
+
+		fileInfo, err := os.Stat(fullPath)
+		if err != nil || fileInfo.IsDir() {
+			log.Printf("Log file not found or is a directory: %s", fullPath)
+			http.Error(w, "Error: log file not found or is not a regular file", http.StatusNotFound)
+			return
+		}
+
+		f, err := os.Open(fullPath)
+		if err != nil {
+			log.Printf("File not found %s", fullPath)
+			http.Error(w, "Error: file not found", http.StatusNotFound)
+			return
+		}
+		defer f.Close()
+
+		w.Header().Set("Content-Type", "application/octet-stream")
+		w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, fileName))
+		w.Header().Set("Content-Length", strconv.FormatInt(fileInfo.Size(), 10))
+
+		if _, err := io.Copy(w, f); err != nil {
+			log.Printf("Download interrupted for %s: %v", fileName, err)
+		}
 	}
 }
 

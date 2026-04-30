@@ -28,6 +28,10 @@ const LogControls = ({
   matchCount,
   theme,
   onToggleTheme,
+  onDownload,
+  onCancelDownload,
+  isDownloading,
+  downloadProgress,
 }) => {
   return (
     <div className="controls">
@@ -61,6 +65,22 @@ const LogControls = ({
         <button onClick={onStart}>Start</button>
         <button onClick={onStop}>Stop</button>
         <button onClick={onClear}>Clear</button>
+        {!isDownloading ? (
+          <button
+            onClick={() => onDownload(logFile)}
+            disabled={!logFile}
+            className="download-btn"
+          >
+            Download
+          </button>
+        ) : (
+          <button
+            onClick={onCancelDownload}
+            className="download-btn downloading"
+          >
+            Cancel ({downloadProgress}%)
+          </button>
+        )}
         <button onClick={onIncreaseFontSize}>+ Font Size</button>
         <button onClick={onDecreaseFontSize}>- Font Size</button>
         <button onClick={onToggleLineNumbers}>

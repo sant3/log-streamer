@@ -6,6 +6,7 @@ import LogControls from './components/LogControls';
 import LogViewer from './components/LogViewer';
 import useLogStream from './hooks/useLogStream';
 import useServerStatus from './hooks/useServerStatus';
+import useFileDownload from './hooks/useFileDownload';
 
 const getQueryParam = (param) => {
   const queryParams = new URLSearchParams(window.location.search);
@@ -54,6 +55,13 @@ function App() {
   // Custom hooks
   const serverStatuses = useServerStatus(servers);
   const { logs, error, isStreaming, startStream, stopStream, clearLogs } = useLogStream(activeHost);
+  const {
+    download: downloadFile,
+    cancel: cancelDownload,
+    isDownloading,
+    progress: downloadProgress,
+    error: downloadError,
+  } = useFileDownload(activeHost);
 
   // Load servers from global variable
   useEffect(() => {
@@ -246,6 +254,10 @@ function App() {
               matchCount={matchCount}
               theme={theme}
               onToggleTheme={toggleTheme}
+              onDownload={downloadFile}
+              onCancelDownload={cancelDownload}
+              isDownloading={isDownloading}
+              downloadProgress={downloadProgress}
             />
           </div>
           <LogViewer
@@ -256,6 +268,11 @@ function App() {
             highlightText={highlightText}
             logContainerRef={logContainerRef}
           />
+          {downloadError && (
+            <div className="download-error" role="alert">
+              Download error: {downloadError}
+            </div>
+          )}
         </div>
       </div>
     </div>
